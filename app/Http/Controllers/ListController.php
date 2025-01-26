@@ -36,19 +36,22 @@ class ListController extends Controller
                 continue;
             }
 
-            // Insert phone number into the database
-            PhoneNumber::create([
-                'group_id' => 1,
-                'country' => 'Bangladesh',
-                'name' => $row[0],
-                'location' => $row[1],
-                'number' => $row[2],
-                'status' => 'active',
-            ]);
+            // Check if the number already exists and only insert if it doesn't
+            PhoneNumber::firstOrCreate(
+                ['number' => $row[2]], // Check for this unique column
+                [
+                    'group_id' => 1,
+                    'country' => 'Bangladesh',
+                    'name' => $row[0],
+                    'location' => $row[1],
+                    'status' => 'active',
+                ]
+            );
         }
 
         fclose($handle);
 
         return back()->with('success', 'CSV file uploaded and phone numbers saved successfully!');
     }
+
 }
